@@ -1,0 +1,5 @@
+---
+- name: plug-kitchen-1
+  id: 87e98a987b87b12354a54c
+  key: 0987654321abcdef
+  ip: 192.168.1.5
