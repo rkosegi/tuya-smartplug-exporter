@@ -21,7 +21,6 @@ import (
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/exporter"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/types"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -124,7 +123,7 @@ func main() {
 }
 
 func loadConfig(path string) (*[]types.Device, error) {
-	if bytes, err := ioutil.ReadFile(path); err != nil {
+	if bytes, err := os.ReadFile(path); err != nil {
 		return nil, err
 	} else {
 		devs := make([]types.Device, 0)
