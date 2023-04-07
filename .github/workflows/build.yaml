@@ -23,13 +23,6 @@ jobs:
         with:
           ref: ${{github.event.pull_request.head.sha}}
 
-      - name: Lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
-          args: --timeout=3m
-          only-new-issues: true
-
       - uses: actions/setup-python@v4
       - uses: pre-commit/action@v3.0.0
 
