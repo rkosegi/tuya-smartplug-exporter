@@ -18,12 +18,10 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: check-merge-conflict
-  - repo: https://github.com/golangci/golangci-lint
-    rev: v1.56.2
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.23
     hooks:
       - id: golangci-lint
-  - repo: https://github.com/dnephin/pre-commit-golang
-    rev: v0.5.1
-    hooks:
-      - id: go-mod-tidy
-      - id: go-fmt
+      - id: goimports
+      - id: gofmt
+      - id: helmlint
