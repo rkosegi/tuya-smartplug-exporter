@@ -31,6 +31,11 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Install lint tools
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install golang.org/x/tools/cmd/goimports@latest
+
       - name: Set up Helm
         uses: azure/setup-helm@v3.5
         with:
