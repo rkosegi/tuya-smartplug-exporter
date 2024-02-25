@@ -17,4 +17,4 @@ name: tuya-smartplug-exporter
 description: A Helm chart for Tuya smartplug prometheus exporter
 type: application
 version: 1.0.0
-appVersion: 1.0.0
+appVersion: v1.0.0
