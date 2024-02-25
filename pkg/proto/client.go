@@ -20,9 +20,10 @@ import (
 	"crypto/aes"
 	"encoding/binary"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"hash/crc32"
 	"net"
+
+	"github.com/pkg/errors"
 )
 
 var (

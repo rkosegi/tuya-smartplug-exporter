@@ -17,12 +17,13 @@ limitations under the License.
 package exporter
 
 import (
+	"time"
+
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/proto"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/types"
-	"time"
 )
 
 type exporter struct {

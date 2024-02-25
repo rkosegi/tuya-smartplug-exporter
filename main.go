@@ -18,11 +18,12 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/exporter"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/types"
 	"gopkg.in/yaml.v3"
-	"net/http"
-	"os"
 
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/go-kit/log"
@@ -41,17 +42,9 @@ const (
 )
 
 var (
-	webConfig = webflag.AddFlags(kingpin.CommandLine, ":9999")
-
-	metricPath = kingpin.Flag(
-		"web.telemetry-path",
-		"Path under which to expose metrics.",
-	).Default("/metrics").String()
-
-	configFile = kingpin.Flag(
-		"config.file",
-		"Path to YAML file with configuration",
-	).Default("config.yaml").String()
+	webConfig  = webflag.AddFlags(kingpin.CommandLine, ":9999")
+	metricPath = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
+	configFile = kingpin.Flag("config.file", "Path to YAML file with configuration").Default("config.yaml").String()
 )
 
 func init() {
@@ -80,9 +73,7 @@ func main() {
 	kingpin.Parse()
 
 	logger := promlog.New(promlogConfig)
-	level.Info(logger).Log("msg", fmt.Sprintf("Starting %s", progName),
-		"version", version.Info(),
-		"config", *configFile)
+	level.Info(logger).Log("msg", fmt.Sprintf("Starting %s", progName), "version", version.Info(), "config", *configFile)
 
 	devs, err := loadConfig(*configFile)
 

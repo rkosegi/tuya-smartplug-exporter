@@ -17,6 +17,22 @@ Tested with Immax Neo Lite smart plug.
   ip: 192.168.1.5
 ```
 
+### Run locally
+
+```shell
+./exporter
+ts=2024-02-25T08:18:50.577Z caller=main.go:83 level=info msg="Starting tuya_smartplug_exporter" version="(version=v1.0.0, branch=main, revision=9d0b7b3)" config=config.yaml
+ts=2024-02-25T08:18:50.582Z caller=main.go:98 level=info msg="Configured 1 devices"
+ts=2024-02-25T08:18:50.583Z caller=tls_config.go:313 level=info msg="Listening on" address=[::]:9999
+ts=2024-02-25T08:18:50.583Z caller=tls_config.go:316 level=info msg="TLS is disabled." http2=false address=[::]:9999
+```
+
+### Run using docker
+
+```shell
+docker run -ti -v $(pwd)/config.yaml:/config.yaml:ro ghcr.io/rkosegi/tuya-smartplug-exporter:v1.0.1
+```
+
 ### Example output
 
 ```shell
