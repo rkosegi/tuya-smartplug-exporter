@@ -29,10 +29,11 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/promlog/flag"
-	"github.com/prometheus/common/version"
+	pv "github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
 	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
 )
@@ -68,12 +69,12 @@ func newHandler(devices *[]types.Device, logger log.Logger, m types.Metrics) htt
 func main() {
 	promlogConfig := &promlog.Config{}
 	flag.AddFlags(kingpin.CommandLine, promlogConfig)
-	kingpin.Version(version.Print(progName))
+	kingpin.Version(pv.Print(progName))
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
 	logger := promlog.New(promlogConfig)
-	level.Info(logger).Log("msg", fmt.Sprintf("Starting %s", progName), "version", version.Info(), "config", *configFile)
+	level.Info(logger).Log("msg", fmt.Sprintf("Starting %s", progName), "version", pv.Info(), "config", *configFile)
 
 	devs, err := loadConfig(*configFile)
 
