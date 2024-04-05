@@ -20,6 +20,7 @@ import (
 	"crypto/aes"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"hash/crc32"
 	"net"
 
@@ -58,8 +59,14 @@ type proto struct {
 	id  string
 }
 
-func (p *proto) Status() (*Response, error) {
-	var resp Response
+func (p *proto) Status() (resp *Response, err error) {
+	defer func() {
+		if x := recover(); x != nil {
+			err = fmt.Errorf("protocol error: %s, check device key", x)
+		}
+	}()
+
+	var r Response
 	data, err := p.exchange()
 	if err != nil {
 		return nil, err
@@ -68,11 +75,12 @@ func (p *proto) Status() (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(unpad(data), &resp)
+	err = json.Unmarshal(unpad(data), &r)
 	if err != nil {
 		return nil, err
 	}
-	return &resp, nil
+	resp = &r
+	return resp, nil
 }
 
 func NewClient(ip string, id string, key []byte) Proto {
