@@ -37,7 +37,7 @@ jobs:
           go install golang.org/x/tools/cmd/goimports@latest
 
       - name: Set up Helm
-        uses: azure/setup-helm@v3.5
+        uses: azure/setup-helm@v4
         with:
           version: v3.12.0
 
