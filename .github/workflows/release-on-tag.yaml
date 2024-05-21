@@ -13,39 +13,20 @@
 # limitations under the License.
 ---
 name: Create release on tag push
-
 on:
   push:
-    tags: [ v*]
-  workflow_dispatch:
+    tags:
+      - v*
+
+permissions:
+  packages: write
+  contents: write
 
 jobs:
-  create-release:
-    permissions:
-      contents: write
+  release:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Create Release
-        run: |
-          tag_name=$(git describe --tags --abbrev=0)
-
-          release_exists=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                             "https://api.github.com/repos/${{ github.repository }}/releases/tags/$tag_name" \
-                             | jq -r '.id')
-
-          set +e
-          if [[ -z "$release_exists" ]] || [[ "$release_exists" == "null" ]]; then
-            curl --fail -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                 -H "Accept: application/vnd.github.v3+json" \
-                 -d '{"tag_name": "'"$tag_name"'", "name": "'"$tag_name"'", "draft": false, "prerelease": false}' \
-                 "https://api.github.com/repos/${{ github.repository }}/releases"
-          else
-            echo "Release already exists for tag $tag_name."
-            exit 1
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
