@@ -15,6 +15,7 @@
 module github.com/rkosegi/tuya-smartplug-exporter
 
 go 1.22
+
 toolchain go1.22.5
 
 require (
@@ -22,7 +23,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.2
-	github.com/prometheus/common v0.58.0
+	github.com/prometheus/common v0.59.1
 	github.com/prometheus/exporter-toolkit v0.12.0
 	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
