@@ -18,6 +18,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -26,13 +27,11 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/alecthomas/kingpin/v2"
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/promlog"
-	"github.com/prometheus/common/promlog/flag"
+	"github.com/prometheus/common/promslog"
+	"github.com/prometheus/common/promslog/flag"
 	pv "github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
 	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
@@ -52,7 +51,7 @@ func init() {
 	prometheus.MustRegister(version.NewCollector(progName))
 }
 
-func newHandler(devices *[]types.Device, logger log.Logger, m types.Metrics) http.HandlerFunc {
+func newHandler(devices *[]types.Device, logger *slog.Logger, m types.Metrics) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		registry := prometheus.NewRegistry()
 		registry.MustRegister(exporter.NewExporter(devices, logger, m))
@@ -67,27 +66,27 @@ func newHandler(devices *[]types.Device, logger log.Logger, m types.Metrics) htt
 }
 
 func main() {
-	promlogConfig := &promlog.Config{}
+	promlogConfig := &promslog.Config{}
 	flag.AddFlags(kingpin.CommandLine, promlogConfig)
 	kingpin.Version(pv.Print(progName))
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
-	logger := promlog.New(promlogConfig)
-	level.Info(logger).Log("msg", fmt.Sprintf("Starting %s", progName), "version", pv.Info(), "config", *configFile)
+	logger := promslog.New(promlogConfig)
+	logger.Info(fmt.Sprintf("Starting %s", progName), "version", pv.Info(), "config", *configFile)
 
 	devs, err := loadConfig(*configFile)
 
 	if err != nil {
-		level.Error(logger).Log("msg", "Error reading configuration", "err", err)
+		logger.Error("Error reading configuration", "err", err)
 		os.Exit(1)
 	}
 
 	if len(*devs) == 0 {
-		level.Error(logger).Log("msg", "no devices configured")
+		logger.Error("no devices configured")
 		os.Exit(1)
 	} else {
-		level.Info(logger).Log("msg", fmt.Sprintf("Configured %d devices", len(*devs)))
+		logger.Info(fmt.Sprintf("Configured %d devices", len(*devs)))
 	}
 
 	var landingPage = []byte(`<html>
@@ -103,12 +102,12 @@ func main() {
 	http.Handle(*metricPath, promhttp.InstrumentMetricHandler(prometheus.DefaultRegisterer, handlerFunc))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if _, err = w.Write(landingPage); err != nil {
-			level.Error(logger).Log("msg", "Unable to write page content", "err", err)
+			logger.Error("Unable to write page content", "err", err)
 		}
 	})
 	srv := &http.Server{}
 	if err := web.ListenAndServe(srv, webConfig, logger); err != nil {
-		level.Error(logger).Log("msg", "Error starting HTTP server", "err", err)
+		logger.Error("Error starting HTTP server", "err", err)
 		os.Exit(1)
 	}
 }
