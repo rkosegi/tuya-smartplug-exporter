@@ -17,10 +17,9 @@ limitations under the License.
 package exporter
 
 import (
+	"log/slog"
 	"time"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/proto"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/types"
@@ -29,7 +28,7 @@ import (
 type exporter struct {
 	m    types.Metrics
 	devs *[]types.Device
-	l    log.Logger
+	l    *slog.Logger
 }
 
 func (e *exporter) Describe(descs chan<- *prometheus.Desc) {
@@ -53,7 +52,7 @@ func (e *exporter) Collect(c chan<- prometheus.Metric) {
 		client := proto.NewClient(dev.Ip, dev.Id, []byte(dev.Key))
 		status, err := client.Status()
 		if err != nil {
-			level.Warn(e.l).Log("msg", "error during scrape", "device", dev.Name, "error", err)
+			e.l.Warn("error during scrape", "device", dev.Name, "error", err)
 			e.m.ScrapeErrors.With(labels).Inc()
 			e.m.Error.Set(1)
 		} else {
@@ -78,7 +77,7 @@ func (e *exporter) Collect(c chan<- prometheus.Metric) {
 	e.m.SwitchOn.Collect(c)
 }
 
-func NewExporter(devices *[]types.Device, logger log.Logger, m types.Metrics) prometheus.Collector {
+func NewExporter(devices *[]types.Device, logger *slog.Logger, m types.Metrics) prometheus.Collector {
 	return &exporter{
 		m:    m,
 		devs: devices,
