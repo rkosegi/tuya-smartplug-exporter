@@ -19,7 +19,7 @@ COPY . /build
 
 RUN make build-local
 
-FROM gcr.io/distroless/static:nonroot
+FROM cgr.dev/chainguard/static:latest
 ARG VERSION
 ARG BUILD_DATE
 ARG GIT_COMMIT
