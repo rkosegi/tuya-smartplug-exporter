@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"hash/crc32"
 	"net"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -171,7 +169,7 @@ func (p *proto) exchange() ([]byte, error) {
 		return nil, err
 	}
 	if read == 0 {
-		return nil, errors.Wrap(err, "no data received from device")
+		return nil, err
 	}
 	err = conn.Close()
 	if err != nil {
