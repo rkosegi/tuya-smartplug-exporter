@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package exporter
 
 import "github.com/prometheus/client_golang/prometheus"
 
@@ -33,12 +33,6 @@ type Device struct {
 }
 
 type Metrics struct {
-	TotalScrapes   prometheus.Counter
-	ScrapeDuration *prometheus.SummaryVec
-	ScrapeErrors   *prometheus.CounterVec
-	Error          prometheus.Gauge
-	Current        *prometheus.GaugeVec
-	Voltage        *prometheus.GaugeVec
-	Power          *prometheus.GaugeVec
-	SwitchOn       *prometheus.GaugeVec
+	TotalScrapes prometheus.Counter
+	Error        prometheus.Gauge
 }

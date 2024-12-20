@@ -18,68 +18,71 @@ package exporter
 
 import (
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/proto"
-	"github.com/rkosegi/tuya-smartplug-exporter/pkg/types"
 )
 
 type exporter struct {
-	m    types.Metrics
-	devs *[]types.Device
+	m    Metrics
+	devs *[]Device
 	l    *slog.Logger
 }
 
-func (e *exporter) Describe(descs chan<- *prometheus.Desc) {
-	e.m.Error.Describe(descs)
-	e.m.ScrapeDuration.Describe(descs)
-	e.m.TotalScrapes.Describe(descs)
-	e.m.ScrapeErrors.Describe(descs)
-	e.m.Current.Describe(descs)
-	e.m.Voltage.Describe(descs)
-	e.m.Power.Describe(descs)
-	e.m.SwitchOn.Describe(descs)
+func (e *exporter) Describe(ch chan<- *prometheus.Desc) {
+	e.m.Error.Describe(ch)
+	e.m.TotalScrapes.Describe(ch)
 }
 
-func (e *exporter) Collect(c chan<- prometheus.Metric) {
+func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 	e.m.Error.Set(0)
 	e.m.TotalScrapes.Inc()
-	e.m.ScrapeDuration.Reset()
+
+	var wg sync.WaitGroup
+	defer wg.Wait()
 	for _, dev := range *e.devs {
-		start := time.Now().UnixMilli()
-		labels := prometheus.Labels{"device": dev.Name}
-		client := proto.NewClient(dev.Ip, dev.Id, []byte(dev.Key))
-		status, err := client.Status()
-		if err != nil {
-			e.l.Warn("error during scrape", "device", dev.Name, "error", err)
-			e.m.ScrapeErrors.With(labels).Inc()
-			e.m.Error.Set(1)
-		} else {
-			ison := 0
-			e.m.Current.With(labels).Set(float64(status.Dps.Current) / 1000)
-			e.m.Voltage.With(labels).Set(float64(status.Dps.Voltage) / 10)
-			e.m.Power.With(labels).Set(float64(status.Dps.Power) / 10)
-			if status.Dps.SwitchOn {
-				ison = 1
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			m := newDeviceMetrics()
+			start := time.Now()
+			labels := prometheus.Labels{"device": dev.Name}
+			e.l.Debug("Connecting to device", "device", dev.Name, "address", dev.Ip)
+			client := proto.NewClient(dev.Ip, dev.Id, []byte(dev.Key))
+			status, err := client.Status()
+			e.l.Debug("Status of device", "device", dev.Name, "status", status)
+			if err != nil {
+				e.l.Warn("error during scrape", "device", dev.Name, "error", err)
+				m.ScrapeErrors.With(labels).Inc()
+				e.m.Error.Set(1)
+			} else {
+				ison := 0
+				m.Current.With(labels).Set(float64(status.Dps.Current) / 1000)
+				m.Voltage.With(labels).Set(float64(status.Dps.Voltage) / 10)
+				m.Power.With(labels).Set(float64(status.Dps.Power) / 10)
+				if status.Dps.SwitchOn {
+					ison = 1
+				}
+				m.SwitchOn.With(labels).Set(float64(ison))
 			}
-			e.m.SwitchOn.With(labels).Set(float64(ison))
-		}
-		e.m.ScrapeDuration.With(labels).Observe(float64(time.Now().UnixMilli() - start))
+			m.ScrapeDuration.With(labels).Observe(time.Since(start).Seconds())
+
+			m.SwitchOn.Collect(ch)
+			m.Current.Collect(ch)
+			m.Voltage.Collect(ch)
+			m.Power.Collect(ch)
+			m.ScrapeDuration.Collect(ch)
+		}()
 	}
-	e.m.Error.Collect(c)
-	e.m.ScrapeDuration.Collect(c)
-	e.m.TotalScrapes.Collect(c)
-	e.m.ScrapeErrors.Collect(c)
-	e.m.Current.Collect(c)
-	e.m.Voltage.Collect(c)
-	e.m.Power.Collect(c)
-	e.m.SwitchOn.Collect(c)
+	e.m.Error.Collect(ch)
+	e.m.TotalScrapes.Collect(ch)
 }
 
-func NewExporter(devices *[]types.Device, logger *slog.Logger, m types.Metrics) prometheus.Collector {
+func New(devices *[]Device, logger *slog.Logger) prometheus.Collector {
 	return &exporter{
-		m:    m,
+		m:    newCommonMetrics(),
 		devs: devices,
 		l:    logger,
 	}
