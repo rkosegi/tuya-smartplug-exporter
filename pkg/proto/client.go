@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"hash/crc32"
 	"net"
+	"time"
 )
 
 var (
@@ -52,9 +53,10 @@ type Proto interface {
 }
 
 type proto struct {
-	key []byte
-	ip  string
-	id  string
+	key     []byte
+	ip      string
+	id      string
+	timeout time.Duration
 }
 
 func (p *proto) Status() (resp *Response, err error) {
@@ -81,11 +83,12 @@ func (p *proto) Status() (resp *Response, err error) {
 	return resp, nil
 }
 
-func NewClient(ip string, id string, key []byte) Proto {
+func NewClient(ip string, id string, key []byte, timeout time.Duration) Proto {
 	return &proto{
-		key: key,
-		ip:  ip,
-		id:  id,
+		key:     key,
+		ip:      ip,
+		id:      id,
+		timeout: timeout,
 	}
 }
 
@@ -155,7 +158,7 @@ func (p *proto) exchange() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	conn, err := net.Dial("tcp", net.JoinHostPort(p.ip, "6668"))
+	conn, err := net.DialTimeout("tcp", net.JoinHostPort(p.ip, "6668"), p.timeout)
 	if err != nil {
 		return nil, err
 	}

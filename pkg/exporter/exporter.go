@@ -53,8 +53,9 @@ func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 			m := newDeviceMetrics()
 			start := time.Now()
 			labels := prometheus.Labels{"device": dev.Name}
-			e.l.Debug("Connecting to device", "device", dev.Name, "address", dev.Ip)
-			client := proto.NewClient(dev.Ip, dev.Id, []byte(dev.Key))
+			timeout := dev.GetTimeout()
+			e.l.Debug("Connecting to device", "device", dev.Name, "address", dev.Ip, "timeout", timeout)
+			client := proto.NewClient(dev.Ip, dev.Id, []byte(dev.Key), timeout)
 			status, err := client.Status()
 			e.l.Debug("Status of device", "device", dev.Name, "status", status)
 			if err != nil {
