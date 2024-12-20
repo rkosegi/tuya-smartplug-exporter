@@ -77,11 +77,12 @@ func newDeviceMetrics() DeviceMetrics {
 
 func newCommonMetrics() Metrics {
 	return Metrics{
-		TotalScrapes: prometheus.NewCounter(prometheus.CounterOpts{
+		// since devices are scraped in parallel, this metric captures overall duration
+		TotalScrapes: prometheus.NewSummary(prometheus.SummaryOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "scrapes_total",
-			Help:      "Total number of scrapes.",
+			Help:      "Summary of scrape operation over all devices",
 		}),
 		Error: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,

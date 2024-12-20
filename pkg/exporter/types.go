@@ -33,6 +33,6 @@ type Device struct {
 }
 
 type Metrics struct {
-	TotalScrapes prometheus.Counter
+	TotalScrapes prometheus.Summary
 	Error        prometheus.Gauge
 }

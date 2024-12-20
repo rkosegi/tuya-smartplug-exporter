@@ -38,10 +38,14 @@ func (e *exporter) Describe(ch chan<- *prometheus.Desc) {
 
 func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 	e.m.Error.Set(0)
-	e.m.TotalScrapes.Inc()
-
+	startAny := time.Now()
 	var wg sync.WaitGroup
-	defer wg.Wait()
+	defer func() {
+		wg.Wait()
+		e.m.TotalScrapes.Observe(time.Since(startAny).Seconds())
+		e.m.Error.Collect(ch)
+		e.m.TotalScrapes.Collect(ch)
+	}()
 	for _, dev := range *e.devs {
 		wg.Add(1)
 		go func() {
@@ -76,8 +80,6 @@ func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 			m.ScrapeDuration.Collect(ch)
 		}()
 	}
-	e.m.Error.Collect(ch)
-	e.m.TotalScrapes.Collect(ch)
 }
 
 func New(devices *[]Device, logger *slog.Logger) prometheus.Collector {
