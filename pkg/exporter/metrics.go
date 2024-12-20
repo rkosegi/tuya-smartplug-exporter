@@ -18,7 +18,6 @@ package exporter
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rkosegi/tuya-smartplug-exporter/pkg/types"
 )
 
 const (
@@ -26,14 +25,17 @@ const (
 	subsystem = "smartplug"
 )
 
-func NewMetrics() types.Metrics {
-	return types.Metrics{
-		TotalScrapes: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: namespace,
-			Subsystem: subsystem,
-			Name:      "scrapes_total",
-			Help:      "Total number of scrapes.",
-		}),
+type DeviceMetrics struct {
+	ScrapeDuration *prometheus.SummaryVec
+	ScrapeErrors   *prometheus.CounterVec
+	Current        *prometheus.GaugeVec
+	Voltage        *prometheus.GaugeVec
+	Power          *prometheus.GaugeVec
+	SwitchOn       *prometheus.GaugeVec
+}
+
+func newDeviceMetrics() DeviceMetrics {
+	return DeviceMetrics{
 		ScrapeDuration: prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -46,12 +48,6 @@ func NewMetrics() types.Metrics {
 			Name:      "scrape_errors_total",
 			Help:      "Total number of times an error occurred while scraping",
 		}, []string{"device"}),
-		Error: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: namespace,
-			Subsystem: subsystem,
-			Name:      "last_scrape_error",
-			Help:      "Whether the last scrape of metrics resulted in an error (1 for error, 0 for success).",
-		}),
 		Current: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -76,5 +72,22 @@ func NewMetrics() types.Metrics {
 			Name:      "switch_on",
 			Help:      "Whether the plug is switched on (1 for on, 0 for off).",
 		}, []string{"device"}),
+	}
+}
+
+func newCommonMetrics() Metrics {
+	return Metrics{
+		TotalScrapes: prometheus.NewCounter(prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "scrapes_total",
+			Help:      "Total number of scrapes.",
+		}),
+		Error: prometheus.NewGauge(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "last_scrape_error",
+			Help:      "Whether the last scrape of metrics resulted in an error (1 for error, 0 for success).",
+		}),
 	}
 }
