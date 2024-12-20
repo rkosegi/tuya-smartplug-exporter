@@ -25,15 +25,6 @@ const (
 	subsystem = "smartplug"
 )
 
-type DeviceMetrics struct {
-	ScrapeDuration *prometheus.SummaryVec
-	ScrapeErrors   *prometheus.CounterVec
-	Current        *prometheus.GaugeVec
-	Voltage        *prometheus.GaugeVec
-	Power          *prometheus.GaugeVec
-	SwitchOn       *prometheus.GaugeVec
-}
-
 func newDeviceMetrics() DeviceMetrics {
 	return DeviceMetrics{
 		ScrapeDuration: prometheus.NewSummaryVec(prometheus.SummaryOpts{
@@ -75,8 +66,8 @@ func newDeviceMetrics() DeviceMetrics {
 	}
 }
 
-func newCommonMetrics() Metrics {
-	return Metrics{
+func newCommonMetrics() GlobalMetrics {
+	return GlobalMetrics{
 		// since devices are scraped in parallel, this metric captures overall duration
 		TotalScrapes: prometheus.NewSummary(prometheus.SummaryOpts{
 			Namespace: namespace,
