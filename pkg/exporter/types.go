@@ -16,7 +16,15 @@ limitations under the License.
 
 package exporter
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	defTimeOut = time.Second * 30
+)
 
 type PlugInfo struct {
 	Voltage float64
@@ -26,10 +34,27 @@ type PlugInfo struct {
 }
 
 type Device struct {
-	Name string
-	Id   string
-	Key  string
-	Ip   string
+	Name    string
+	Id      string
+	Key     string
+	Ip      string
+	Timeout *time.Duration
+}
+
+func (d Device) GetTimeout() time.Duration {
+	if d.Timeout == nil {
+		return defTimeOut
+	}
+	return *d.Timeout
+}
+
+type DeviceMetrics struct {
+	ScrapeDuration *prometheus.SummaryVec
+	ScrapeErrors   *prometheus.CounterVec
+	Current        *prometheus.GaugeVec
+	Voltage        *prometheus.GaugeVec
+	Power          *prometheus.GaugeVec
+	SwitchOn       *prometheus.GaugeVec
 }
 
 type GlobalMetrics struct {

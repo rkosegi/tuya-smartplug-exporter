@@ -18,12 +18,13 @@ package proto
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEncryptRequest(t *testing.T) {
-	c := NewClient("192.168.1.30", "87e98a987b87b12354a54c", []byte("0987654321abcdef")).(*proto)
+	c := NewClient("192.168.1.30", "87e98a987b87b12354a54c", []byte("0987654321abcdef"), time.Second).(*proto)
 	data, err := c.encryptRequest()
 	if err != nil {
 		t.Fatal(err)
