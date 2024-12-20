@@ -75,9 +75,9 @@ build-docker:
 		.
 
 build-local:
-	go fmt
+	go fmt ./pkg/...
 	go mod tidy
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o exporter
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o exporter ./pkg/cmd/main.go
 
 
 .PHONY: build-local build-docker clean lint test gen-docs update-go-deps bump-patch-version
