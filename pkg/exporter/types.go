@@ -32,7 +32,7 @@ type Device struct {
 	Ip   string
 }
 
-type Metrics struct {
+type GlobalMetrics struct {
 	TotalScrapes prometheus.Summary
 	Error        prometheus.Gauge
 }

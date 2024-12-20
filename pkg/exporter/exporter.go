@@ -26,7 +26,7 @@ import (
 )
 
 type exporter struct {
-	m    Metrics
+	m    GlobalMetrics
 	devs *[]Device
 	l    *slog.Logger
 }
