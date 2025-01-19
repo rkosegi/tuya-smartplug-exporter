@@ -91,7 +91,7 @@ func main() {
 
 	landingPage, err := web.NewLandingPage(web.LandingConfig{
 		Name:        progName,
-		Description: "Prometheus Exporter for smart plug devices",
+		Description: "Prometheus Exporter for TUYA smart plug devices",
 		Version:     pv.Info(),
 		Links: []web.LandingLinks{
 			{
