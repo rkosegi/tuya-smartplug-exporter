@@ -26,4 +26,3 @@ repos:
       # - id: golangci-lint
       - id: goimports
       - id: gofmt
-      - id: helmlint

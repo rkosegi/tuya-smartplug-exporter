@@ -68,7 +68,7 @@ First, make sure your values are present in file `my-values.yaml`, then run
 
 ```shell
 helm repo add rkosegi https://rkosegi.github.io/helm-charts/ --force-update
-helm upgrade --install rkosegi/tuya-smartplug-exporter --values my-values.yaml
+helm upgrade --install rkosegi/generic-exporter --values my-values.yaml
 ```
 
 ### Sample Grafana dashboard
