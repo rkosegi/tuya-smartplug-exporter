@@ -63,6 +63,30 @@ func newDeviceMetrics() DeviceMetrics {
 			Name:      "switch_on",
 			Help:      "Whether the plug is switched on (1 for on, 0 for off).",
 		}, []string{"device"}),
+		SentPackets: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "sent_packets_total",
+			Help:      "Total number of sent packets",
+		}, []string{"device"}),
+		ReadPackets: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "read_packets_total",
+			Help:      "Total number of read packets",
+		}, []string{"device"}),
+		SentErrors: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "sent_errors_total",
+			Help:      "Total number of sent errors",
+		}, []string{"device"}),
+		ReadErrors: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "read_errors_total",
+			Help:      "Total number of read errors",
+		}, []string{"device"}),
 	}
 }
 

@@ -1,0 +1,70 @@
+{
+  "$defs": {
+    "deviceConnectionSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Device ID from Tuya API"
+        },
+        "key": {
+          "type": "string",
+          "description": "Encryption key from Tuya API"
+        },
+        "address": {
+          "type": "string",
+          "description": "Device network address.\nMight include port, but if not specified then 6668 is assumed."
+        },
+        "connectTimeout": {
+          "type": "string",
+          "description": "Connection timeout.\nDefault value is 10s"
+        },
+        "readTimeout": {
+          "type": "string",
+          "description": "Network read timeout.\nDefault value is 10s"
+        },
+        "writeTimeout": {
+          "type": "string",
+          "description": "Network write timeout.\nDefault value is 10s"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "What protocol to use when talking to device.\nDefault value is \"tuya3.1\""
+        }
+      },
+      "required": [
+        "name",
+        "id",
+        "key",
+        "protocol",
+        "address"
+      ]
+    },
+    "devicesContainer": {
+      "type": "object",
+      "description": "Map of device name to connection specification.\nMapping key must be a valid label value",
+      "additionalProperties": {
+        "$ref": "#/$defs/deviceConnectionSpec"
+      }
+    },
+    "configSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Root configuration object",
+      "properties": {
+        "devices": {
+          "$ref": "#/$defs/devicesContainer"
+        }
+      },
+      "required": [
+        "devices"
+      ]
+    }
+  },
+  "$id": "https://github.com/rkosegi/tuya-smartplug-exporter/config.schema.v1",
+  "$ref": "#/$defs/configSpec",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tuya smartplug exporter configuration JSON schema v1",
+  "type": "object"
+}

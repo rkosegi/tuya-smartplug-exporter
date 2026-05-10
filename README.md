@@ -3,7 +3,21 @@
 Prometheus exporter for [Tuya](https://iot.tuya.com/)-based smart plug devices.
 Tested with Immax Neo Lite smart plug.
 
-![smartplug](docs/smartplug.jpg)
+Following Tuya LAN protocol versions are supported <sup>1</sup>/tested.
+
+| Version | Supported | Tested |
+|---------|-----------|--------|
+| `3.1`   | ✅         | ✅      |
+| `3.2`   | ❔         | 🚫     |
+| `3.3`   | ❔         | 🚫     |
+| `3.4`   | ✅         | ✅      |
+| `3.5`   | 🚫        | 🚫     |
+
+_1 - supported by protocol library, not by exporter itself_
+
+<img width="271" src="docs/smartplug.jpg" alt="smartplug">
+<img width="271" src="docs/smartplug2.jpg" alt="smartplug2">
+
 
 ### Setup
 
@@ -11,11 +25,16 @@ Tested with Immax Neo Lite smart plug.
 - Populate config file, [here is an example](config.yaml):
 
 ```yaml
-- name: plug-kitchen-1
-  id: 87e98a987b87b12354a54c
-  key: 0987654321abcdef
-  ip: 192.168.1.5
+devices:
+  plug-kitchen-1:
+    id: 87e98a987b87b12354a54c
+    key: 0987654321abcdef
+    address: 192.168.1.5:6668
+    connectTimeout: 10s
+    readTimeout: 7s
 ```
+
+_Note: there is JSON schema for configuration [here](config.schema.v1.json)_
 
 ### Run locally
 
@@ -30,14 +49,14 @@ ts=2024-02-25T08:18:50.583Z caller=tls_config.go:316 level=info msg="TLS is disa
 ### Run using docker
 
 ```shell
-docker run -ti -v $(pwd)/config.yaml:/config.yaml:ro ghcr.io/rkosegi/tuya-smartplug-exporter:v1.0.1
+docker run -ti -v $(pwd)/config.yaml:/config.yaml:ro ghcr.io/rkosegi/tuya-smartplug-exporter:v1.1.0
 ```
 
 ### Example output
 
 ```shell
 curl --silent localhost:9999/metrics | grep ^tuya
-tuya_smartplug_exporter_build_info{branch="main",goarch="amd64",goos="linux",goversion="go1.23.0",revision="96c611a",tags="unknown",version="v1.0.4"} 1
+tuya_smartplug_exporter_build_info{branch="main",goarch="amd64",goos="linux",goversion="go1.26.2",revision="96c611a",tags="unknown",version="v1.1.0"} 1
 tuya_smartplug_last_scrape_error 0
 tuya_smartplug_current{device="livingroom-1"} 0.093
 tuya_smartplug_power{device="livingroom-1"} 8.6
@@ -46,6 +65,9 @@ tuya_smartplug_scrape_duration_count{device="livingroom-1"} 1
 tuya_smartplug_total_scrapes_sum 0.62671565
 tuya_smartplug_total_scrapes_count 3
 tuya_smartplug_voltage{device="livingroom-1"} 242.9
+tuya_smartplug_read_packets_total{device="livingroom-1"} 6
+tuya_smartplug_sent_packets_total{device="livingroom-1"} 9
+
 ```
 
 ### Description of metrics
@@ -60,6 +82,10 @@ tuya_smartplug_voltage{device="livingroom-1"} 242.9
 | `tuya_smartplug_scrape_duration`     | `Summary` | Summary of scrape operation                           | Device |
 | `tuya_smartplug_switch_on`           | `Gauge`   | Whether the plug is switched on (1 for on, 0 for off) | Device |
 | `tuya_smartplug_voltage`             | `Gauge`   | Electrical voltage, in Volts                          | Device |
+| `tuya_smartplug_read_errors_total`   | `Counter` | Total number of read errors                           | Device |
+| `tuya_smartplug_read_packets_total`  | `Counter` | Total number of read packets                          | Device |
+| `tuya_smartplug_sent_errors_total`   | `Counter` | Total number of sent errors                           | Device |
+| `tuya_smartplug_sent_packets_total`  | `Counter` | Total number of sent packets                          | Device |
 
 
 ### Install using Helm chart to k8s cluster

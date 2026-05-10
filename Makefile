@@ -54,12 +54,9 @@ new-release: bump-patch-version git-tag
 
 update-go-deps:
 	@for m in $$(go list -mod=readonly -m -f '{{ if and (not .Indirect) (not .Main)}}{{.Path}}{{end}}' all); do \
-		go get -d $$m; \
+		go get $$m; \
 	done
 	go mod tidy
-
-gen-docs:
-	cd chart && frigate gen . > README.md
 
 lint:
 	pre-commit run --all-files
@@ -78,6 +75,15 @@ build-local:
 	go fmt ./pkg/...
 	go mod tidy
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o exporter ./pkg/cmd/main.go
+
+jsonschema-to-openapi:
+	test -d .private || mkdir .private
+	yq '.$$defs | {"components": {"schemas": . }}' config.schema.v1.json -oyaml > .private/openapi-spec.yaml
+	yq eval-all '. as $$item ireduce ({}; . *+ $$item)' -i .private/openapi-spec.yaml generator.patch.yaml -oyaml
+	sed -i 's#/$$defs/#/components/schemas/#g' .private/openapi-spec.yaml
+
+generate: jsonschema-to-openapi
+	go tool oapi-codegen --config=.openapi-config.yaml .private/openapi-spec.yaml
 
 
 .PHONY: build-local build-docker clean lint test gen-docs update-go-deps bump-patch-version
