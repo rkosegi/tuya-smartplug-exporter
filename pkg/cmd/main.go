@@ -25,6 +25,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/exporter"
+	"github.com/rkosegi/tuya-smartplug-exporter/pkg/internal"
 	"gopkg.in/yaml.v3"
 
 	"github.com/alecthomas/kingpin/v2"
@@ -62,7 +63,7 @@ func main() {
 	logger.Info("Exporter starting", "name", progName, "version", pv.Info(), "config.file", *configFile)
 	logger.Info("Build context", "build_context", pv.BuildContext())
 
-	devs, err := loadConfig(*configFile)
+	cfg, err := loadConfig(*configFile)
 
 	if err != nil {
 		logger.Error("Error reading configuration", "err", err, "config.file", *configFile)
@@ -71,9 +72,9 @@ func main() {
 
 	r := prometheus.NewRegistry()
 	r.MustRegister(version.NewCollector(strings.ReplaceAll(progName, " ", "_")))
-	r.MustRegister(exporter.New(devs, logger))
+	r.MustRegister(exporter.New(cfg, logger))
 
-	logger.Info("Device list loaded", "count", len(*devs))
+	logger.Info("Devices loaded", "count", len(cfg.Devices))
 	handler := promhttp.HandlerFor(
 		prometheus.Gatherers{r},
 		promhttp.HandlerOpts{
@@ -124,22 +125,22 @@ func main() {
 	}
 }
 
-func loadConfig(path string) (*[]exporter.Device, error) {
+func loadConfig(path string) (*internal.ConfigSpec, error) {
 	var (
 		err   error
 		bytes []byte
-		out   []exporter.Device
+		cfg   internal.ConfigSpec
 	)
 	bytes, err = os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	err = yaml.Unmarshal(bytes, &out)
+	err = yaml.Unmarshal(bytes, &cfg)
 	if err != nil {
 		return nil, err
 	}
-	if len(out) == 0 {
+	if len(cfg.Devices) == 0 {
 		return nil, errNoDevs
 	}
-	return &out, nil
+	return &cfg, nil
 }

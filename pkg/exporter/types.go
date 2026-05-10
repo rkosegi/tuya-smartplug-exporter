@@ -22,10 +22,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var (
-	defTimeOut = time.Second * 30
-)
-
 type PlugInfo struct {
 	Voltage float64
 	Power   float64
@@ -41,13 +37,6 @@ type Device struct {
 	Timeout *time.Duration
 }
 
-func (d Device) GetTimeout() time.Duration {
-	if d.Timeout == nil {
-		return defTimeOut
-	}
-	return *d.Timeout
-}
-
 type DeviceMetrics struct {
 	ScrapeDuration *prometheus.SummaryVec
 	ScrapeErrors   *prometheus.CounterVec
@@ -55,6 +44,10 @@ type DeviceMetrics struct {
 	Voltage        *prometheus.GaugeVec
 	Power          *prometheus.GaugeVec
 	SwitchOn       *prometheus.GaugeVec
+	SentPackets    *prometheus.CounterVec
+	ReadPackets    *prometheus.CounterVec
+	SentErrors     *prometheus.CounterVec
+	ReadErrors     *prometheus.CounterVec
 }
 
 type GlobalMetrics struct {

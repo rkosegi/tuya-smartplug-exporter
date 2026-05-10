@@ -1,5 +1,10 @@
 ---
-- name: plug-kitchen-1
-  id: 87e98a987b87b12354a54c
-  key: 0987654321abcdef
-  ip: 192.168.1.5
+# yaml-language-server: $schema=./config.schema.v1.json
+devices:
+  plug-kitchen-1:
+    id: 87e98a987b87b12354a54c
+    key: 0987654321abcdef
+    address: 192.168.1.5
+    connectTimeout: 20s
+    readTimeout: 10s
+    protocol: tuya3.4
