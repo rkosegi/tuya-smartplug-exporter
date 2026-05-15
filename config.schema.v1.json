@@ -14,7 +14,7 @@
         },
         "address": {
           "type": "string",
-          "description": "Device network address.\nMight include port, but if not specified then 6668 is assumed."
+          "description": "Device network address.\nIf port is not specified, then value of 6668 is assumed."
         },
         "connectTimeout": {
           "type": "string",
