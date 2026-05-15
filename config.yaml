@@ -5,6 +5,12 @@ devices:
     id: 87e98a987b87b12354a54c
     key: 0987654321abcdef
     address: 192.168.1.5
-    connectTimeout: 20s
-    readTimeout: 10s
+    connectTimeout: 5s
+    readTimeout: 3s
     protocol: tuya3.4
+    extraLabels:
+      tld.acme.myapp/room: kitchen
+      tld.acme.myapp/elec-phase: L1
+extraDeviceLabels:
+  - tld.acme.myapp/room
+  - tld.acme.myapp/elec-phase

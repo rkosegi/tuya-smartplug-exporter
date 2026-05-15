@@ -104,48 +104,59 @@ func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 	}()
 	for dname := range e.cfg.Devices {
 		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			m := newDeviceMetrics()
-			start := time.Now()
-			labels := prometheus.Labels{"device": dname}
-			status, stats, err := e.statusForDevice(dname)
-			m.ReadPackets.With(labels).Add(float64(stats.ReadPkts))
-			m.SentPackets.With(labels).Add(float64(stats.SentPkts))
-			if stats.ReadErrs > 0 {
-				m.ReadErrors.With(labels).Add(float64(stats.ReadErrs))
-			}
-			if stats.SentErrs > 0 {
-				m.SentErrors.With(labels).Add(float64(stats.SentErrs))
-			}
-			if err != nil {
-				e.l.Warn("error during scrape", "device", dname, "error", err)
-				m.ScrapeErrors.With(labels).Inc()
-				e.m.Error.Set(1)
-			} else {
-				e.l.Debug("Status of device", "device", dname, "status", status.Dps)
-				ison := 0
-				m.Current.With(labels).Set(float64(status.Dps.Current) / 1000)
-				m.Voltage.With(labels).Set(float64(status.Dps.Voltage) / 10)
-				m.Power.With(labels).Set(float64(status.Dps.Power) / 10)
-				if status.Dps.SwitchOn {
-					ison = 1
-				}
-				m.SwitchOn.With(labels).Set(float64(ison))
-			}
-			m.ScrapeDuration.With(labels).Observe(time.Since(start).Seconds())
-
-			m.SwitchOn.Collect(ch)
-			m.Current.Collect(ch)
-			m.Voltage.Collect(ch)
-			m.Power.Collect(ch)
-			m.ReadPackets.Collect(ch)
-			m.SentPackets.Collect(ch)
-			m.ReadErrors.Collect(ch)
-			m.SentErrors.Collect(ch)
-			m.ScrapeDuration.Collect(ch)
-		}()
+		go e.collectDevice(dname, ch, &wg)
 	}
+}
+
+func (e *exporter) collectDevice(dname string, ch chan<- prometheus.Metric, wg *sync.WaitGroup) {
+	defer wg.Done()
+	m := e.newDeviceMetrics()
+	start := time.Now()
+	labels := prometheus.Labels{"device": dname}
+	status, stats, err := e.statusForDevice(dname)
+	devCfg := e.cfg.Devices[dname]
+	if devCfg.ExtraLabels != nil {
+		for lk, lv := range *devCfg.ExtraLabels {
+			labels[lk] = lv
+		}
+	}
+	if stats != nil {
+		m.ReadPackets.With(labels).Add(float64(stats.ReadPkts))
+		m.SentPackets.With(labels).Add(float64(stats.SentPkts))
+		if stats.ReadErrs > 0 {
+			m.ReadErrors.With(labels).Add(float64(stats.ReadErrs))
+		}
+		if stats.SentErrs > 0 {
+			m.SentErrors.With(labels).Add(float64(stats.SentErrs))
+		}
+	}
+	if err != nil {
+		e.l.Warn("error during scrape", "device", dname, "error", err)
+		m.ScrapeErrors.With(labels).Inc()
+		e.m.Error.Set(1)
+	} else {
+		e.l.Debug("Status of device", "device", dname, "status", status.Dps)
+		ison := 0
+		m.Current.With(labels).Set(float64(status.Dps.Current) / 1000)
+		m.Voltage.With(labels).Set(float64(status.Dps.Voltage) / 10)
+		m.Power.With(labels).Set(float64(status.Dps.Power) / 10)
+		if status.Dps.SwitchOn {
+			ison = 1
+		}
+		m.SwitchOn.With(labels).Set(float64(ison))
+	}
+	m.ScrapeDuration.With(labels).Observe(time.Since(start).Seconds())
+
+	m.SwitchOn.Collect(ch)
+	m.Current.Collect(ch)
+	m.Voltage.Collect(ch)
+	m.Power.Collect(ch)
+	m.ReadPackets.Collect(ch)
+	m.SentPackets.Collect(ch)
+	m.ReadErrors.Collect(ch)
+	m.SentErrors.Collect(ch)
+	m.ScrapeDuration.Collect(ch)
+
 }
 
 func New(cfg *internal.ConfigSpec, logger *slog.Logger) prometheus.Collector {
