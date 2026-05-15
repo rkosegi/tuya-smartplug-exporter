@@ -12,6 +12,10 @@ type ConfigSpec struct {
 	// Devices Map of device name to connection specification.
 	// Mapping key must be a valid label value
 	Devices DevicesContainer `json:"devices" yaml:"devices"`
+
+	// ExtraDeviceLabels List of additional label names to put on each device metric.
+	// Actual value can be supplied in device configuration.
+	ExtraDeviceLabels *ExtraDeviceLabels `json:"extraDeviceLabels,omitempty" yaml:"extraDeviceLabels,omitempty"`
 }
 
 // DeviceConnectionSpec defines model for deviceConnectionSpec.
@@ -23,6 +27,9 @@ type DeviceConnectionSpec struct {
 	// ConnectTimeout Connection timeout.
 	// Default value is 10s
 	ConnectTimeout time.Duration `json:"connectTimeout" yaml:"connectTimeout"`
+
+	// ExtraLabels Extra labels to set for this device
+	ExtraLabels *map[string]string `json:"extraLabels,omitempty" yaml:"extraLabels,omitempty"`
 
 	// Id Device ID from Tuya API
 	Id string `json:"id" yaml:"id"`
@@ -46,3 +53,7 @@ type DeviceConnectionSpec struct {
 // DevicesContainer Map of device name to connection specification.
 // Mapping key must be a valid label value
 type DevicesContainer map[string]DeviceConnectionSpec
+
+// ExtraDeviceLabels List of additional label names to put on each device metric.
+// Actual value can be supplied in device configuration.
+type ExtraDeviceLabels = []string

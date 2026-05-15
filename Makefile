@@ -86,4 +86,4 @@ generate: jsonschema-to-openapi
 	go tool oapi-codegen --config=.openapi-config.yaml .private/openapi-spec.yaml
 
 
-.PHONY: build-local build-docker clean lint test gen-docs update-go-deps bump-patch-version
+.PHONY: build-local build-docker clean lint test generate update-go-deps bump-patch-version

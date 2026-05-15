@@ -25,68 +25,74 @@ const (
 	subsystem = "smartplug"
 )
 
-func newDeviceMetrics() DeviceMetrics {
+func (e *exporter) newDeviceMetrics() DeviceMetrics {
+	devLabels := []string{"device"}
+	if e.cfg.ExtraDeviceLabels != nil {
+		for _, ln := range *e.cfg.ExtraDeviceLabels {
+			devLabels = append(devLabels, ln)
+		}
+	}
 	return DeviceMetrics{
 		ScrapeDuration: prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "scrape_duration",
 			Help:      "Summary of scrape operation",
-		}, []string{"device"}),
+		}, devLabels),
 		ScrapeErrors: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "scrape_errors_total",
 			Help:      "Total number of times an error occurred while scraping",
-		}, []string{"device"}),
+		}, devLabels),
 		Current: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "current",
 			Help:      "Electrical current drawn, in Amperes",
-		}, []string{"device"}),
+		}, devLabels),
 		Voltage: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "voltage",
 			Help:      "Electrical voltage, in Volts",
-		}, []string{"device"}),
+		}, devLabels),
 		Power: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "power",
 			Help:      "Total power used, in Watts",
-		}, []string{"device"}),
+		}, devLabels),
 		SwitchOn: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "switch_on",
 			Help:      "Whether the plug is switched on (1 for on, 0 for off).",
-		}, []string{"device"}),
+		}, devLabels),
 		SentPackets: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "sent_packets_total",
 			Help:      "Total number of sent packets",
-		}, []string{"device"}),
+		}, devLabels),
 		ReadPackets: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "read_packets_total",
 			Help:      "Total number of read packets",
-		}, []string{"device"}),
+		}, devLabels),
 		SentErrors: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "sent_errors_total",
 			Help:      "Total number of sent errors",
-		}, []string{"device"}),
+		}, devLabels),
 		ReadErrors: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "read_errors_total",
 			Help:      "Total number of read errors",
-		}, []string{"device"}),
+		}, devLabels),
 	}
 }
 

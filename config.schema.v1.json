@@ -20,6 +20,12 @@
           "type": "string",
           "description": "Connection timeout.\nDefault value is 10s"
         },
+        "extraLabels": {
+          "description": "Extra labels to set for this device",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
         "readTimeout": {
           "type": "string",
           "description": "Network read timeout.\nDefault value is 10s"
@@ -48,6 +54,13 @@
         "$ref": "#/$defs/deviceConnectionSpec"
       }
     },
+    "extraDeviceLabels": {
+      "description": "List of additional label names to put on each device metric.\nActual value can be supplied in device configuration.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "configSpec": {
       "type": "object",
       "additionalProperties": false,
@@ -55,6 +68,9 @@
       "properties": {
         "devices": {
           "$ref": "#/$defs/devicesContainer"
+        },
+        "extraDeviceLabels": {
+          "$ref": "#/$defs/extraDeviceLabels"
         }
       },
       "required": [
