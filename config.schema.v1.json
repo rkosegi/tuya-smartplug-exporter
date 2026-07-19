@@ -40,7 +40,6 @@
         }
       },
       "required": [
-        "name",
         "id",
         "key",
         "protocol",
