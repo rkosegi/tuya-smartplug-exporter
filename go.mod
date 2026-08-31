@@ -22,7 +22,7 @@ require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.70.1
-	github.com/prometheus/exporter-toolkit v0.18.0
+	github.com/prometheus/exporter-toolkit v0.19.0
 	github.com/rkosegi/tuya-proto v0.0.0-20260718141727-657265934283
 	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.12.1
