@@ -21,7 +21,7 @@ tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/prometheus/client_golang v1.25.0
-	github.com/prometheus/common v0.72.1
+	github.com/prometheus/common v0.73.0
 	github.com/prometheus/exporter-toolkit v0.20.0
 	github.com/rkosegi/tuya-proto v0.0.0-20260718141727-657265934283
 	github.com/samber/lo v1.53.0
@@ -40,6 +40,7 @@ require (
 	github.com/go-openapi/swag/jsonname v0.26.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mdlayher/vsock v1.3.0 // indirect
@@ -48,6 +49,7 @@ require (
 	github.com/oapi-codegen/oapi-codegen/v2 v2.8.0 // indirect
 	github.com/oasdiff/yaml v0.1.1 // indirect
 	github.com/oasdiff/yaml3 v0.0.14 // indirect
+	github.com/pandatix/go-abnf v0.5.1 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3 // indirect
