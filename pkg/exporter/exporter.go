@@ -18,10 +18,13 @@ package exporter
 
 import (
 	"log/slog"
+	"maps"
 	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rkosegi/tuya-proto/client"
+	"github.com/rkosegi/tuya-proto/dto"
 	"github.com/rkosegi/tuya-proto/proto"
 	"github.com/rkosegi/tuya-smartplug-exporter/pkg/internal"
 	"github.com/samber/lo"
@@ -31,7 +34,7 @@ type exporter struct {
 	m       GlobalMetrics
 	cfg     *internal.ConfigSpec
 	l       *slog.Logger
-	clients map[string]internal.Client
+	clients map[string]client.BlockingClient
 }
 
 func (e *exporter) Describe(ch chan<- *prometheus.Desc) {
@@ -39,7 +42,7 @@ func (e *exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.m.TotalScrapes.Describe(ch)
 }
 
-func (e *exporter) clientForDevice(dc internal.DeviceConnectionSpec) internal.Client {
+func (e *exporter) clientForDevice(dc internal.DeviceConnectionSpec) client.BlockingClient {
 	ver := proto.Version31
 	if dc.Protocol == "tuya3.4" {
 		ver = proto.Version34
@@ -53,15 +56,15 @@ func (e *exporter) clientForDevice(dc internal.DeviceConnectionSpec) internal.Cl
 	if dc.WriteTimeout == 0 {
 		dc.WriteTimeout = time.Second * 10
 	}
-	return internal.NewClient(ver, dc.Address, []byte(dc.Key),
-		internal.WithTimeout(dc.ConnectTimeout),
-		internal.WithReadTimeout(dc.ReadTimeout),
-		internal.WithWriteTimeout(dc.WriteTimeout),
-		internal.WithLogger(e.l.With("address", dc.Address, "protocol", dc.Protocol)),
+	return client.NewBlockingClient(ver, dc.Address, []byte(dc.Key),
+		client.WithTimeout(dc.ConnectTimeout),
+		client.WithReadTimeout(dc.ReadTimeout),
+		client.WithWriteTimeout(dc.WriteTimeout),
+		client.WithLogger(e.l.With("address", dc.Address, "protocol", dc.Protocol)),
 	)
 }
 
-func (e *exporter) statusForDevice(name string) (*internal.DpQueryResponse, *internal.ProtoStats, error) {
+func (e *exporter) statusForDevice(name string) (*internal.DpQueryResponse, *dto.ProtoStats, error) {
 	cl := e.clients[name]
 	dc := e.cfg.Devices[name]
 	var err error
@@ -116,9 +119,7 @@ func (e *exporter) collectDevice(dname string, ch chan<- prometheus.Metric, wg *
 	status, stats, err := e.statusForDevice(dname)
 	devCfg := e.cfg.Devices[dname]
 	if devCfg.ExtraLabels != nil {
-		for lk, lv := range *devCfg.ExtraLabels {
-			labels[lk] = lv
-		}
+		maps.Copy(labels, *devCfg.ExtraLabels)
 	}
 	if stats != nil {
 		m.ReadPackets.With(labels).Add(float64(stats.ReadPkts))
@@ -166,7 +167,7 @@ func New(cfg *internal.ConfigSpec, logger *slog.Logger) prometheus.Collector {
 		l:   logger,
 	}
 	// create mapping dev-name to client
-	e.clients = lo.MapEntries(cfg.Devices, func(name string, dc internal.DeviceConnectionSpec) (string, internal.Client) {
+	e.clients = lo.MapEntries(cfg.Devices, func(name string, dc internal.DeviceConnectionSpec) (string, client.BlockingClient) {
 		return name, e.clientForDevice(dc)
 	})
 	return e
