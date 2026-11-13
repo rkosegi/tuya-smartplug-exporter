@@ -25,7 +25,6 @@ require (
 	github.com/prometheus/exporter-toolkit v0.20.0
 	github.com/rkosegi/tuya-proto v0.0.0-20261110112519-557b21249b35
 	github.com/samber/lo v1.53.0
-	github.com/stretchr/testify v1.12.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
