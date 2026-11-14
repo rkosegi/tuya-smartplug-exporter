@@ -74,11 +74,11 @@ func (e *exporter) statusForDevice(name string) (*internal.DpQueryResponse, *dto
 		}
 	}
 	if dc.Protocol == "tuya3.4" {
-		if err = cl.Send(proto.CmdIdTypeDpQueryNew, make(map[string]interface{})); err != nil {
+		if err = cl.Send(proto.CmdIdTypeDpQueryNew, make(map[string]any)); err != nil {
 			return nil, new(cl.Stats()), err
 		}
 	} else {
-		if err = cl.Send(proto.CmdIdTypeDpQuery, internal.DpQueryRequest{
+		if err = cl.Send(proto.CmdIdTypeDpQuery, dto.DpQueryRequest{
 			GwId:  dc.Id,
 			DevId: dc.Id,
 		}); err != nil {

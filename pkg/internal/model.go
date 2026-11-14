@@ -33,10 +33,3 @@ type DpQueryRequest struct {
 	GwId  string `json:"gwId,omitempty"`
 	DevId string `json:"devId,omitempty"`
 }
-
-type ProtoStats struct {
-	ReadPkts int64
-	ReadErrs int64
-	SentPkts int64
-	SentErrs int64
-}
