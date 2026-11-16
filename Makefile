@@ -42,9 +42,7 @@ bump-patch-version:
 	@echo Current: $(VERSION)
 	@echo Next: $(VER_NEXT_PATCH)
 	@echo "$(VER_NEXT_PATCH)" > VERSION
-	sed -i 's/^appVersion: .*/appVersion: v$(VER_NEXT_PATCH)/g' chart/Chart.yaml
-	sed -i 's/^version: .*/version: $(VER_NEXT_PATCH)/g' chart/Chart.yaml
-	git add -- VERSION Makefile chart/Chart.yaml
+	git add -- VERSION
 	git commit -sm "Bump version to v$(VER_NEXT_PATCH)"
 
 git-tag:
