@@ -22,11 +22,22 @@ updates:
     directory: /
     schedule:
       interval: daily
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     groups:
-      actions-deps:
+      codeql-actions:
         patterns:
           - github/codeql-action*
+      rkosegi-workflows:
+        patterns:
+          - rkosegi/github-workflows*

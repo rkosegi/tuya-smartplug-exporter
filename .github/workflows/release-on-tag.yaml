@@ -25,14 +25,4 @@ jobs:
   release:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
-        with:
-          generate_release_notes: true
+    uses: rkosegi/github-workflows/.github/workflows/release-on-tag.yaml@6b051e22fcf9056ff77e553d6307a6d9b361b438 # v0.0.7
