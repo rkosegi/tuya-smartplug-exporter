@@ -33,6 +33,18 @@ func (e *exporter) newDeviceMetrics() DeviceMetrics {
 		}
 	}
 	return DeviceMetrics{
+		LastSuccessRead: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "last_success_read_seconds",
+			Help:      "Unix timestamp in seconds when last read was successful",
+		}, devLabels),
+		LastFailedRead: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "last_failed_read_seconds",
+			Help:      "Unix timestamp in seconds when last read has failed",
+		}, devLabels),
 		ScrapeDuration: prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,

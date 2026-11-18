@@ -72,20 +72,22 @@ tuya_smartplug_sent_packets_total{device="livingroom-1"} 9
 
 ### Description of metrics
 
-| Name                                 | Type      | Description                                           | Scope  |
-|--------------------------------------|-----------|-------------------------------------------------------|--------|
-| `tuya_smartplug_last_scrape_error`   | `Counter` | Indication of overall error during scrape             | Global |
-| `tuya_smartplug_scrapes_total`       | `Summary` | Overall duration and count of scrapes                 | Global |
-| `tuya_smartplug_exporter_build_info` | `Gauge`   | Build info                                            | Global |
-| `tuya_smartplug_current`             | `Gauge`   | Electrical current drawn, in Amperes                  | Device |
-| `tuya_smartplug_power`               | `Gauge`   | Total power used, in Watts                            | Device |
-| `tuya_smartplug_scrape_duration`     | `Summary` | Summary of scrape operation                           | Device |
-| `tuya_smartplug_switch_on`           | `Gauge`   | Whether the plug is switched on (1 for on, 0 for off) | Device |
-| `tuya_smartplug_voltage`             | `Gauge`   | Electrical voltage, in Volts                          | Device |
-| `tuya_smartplug_read_errors_total`   | `Counter` | Total number of read errors                           | Device |
-| `tuya_smartplug_read_packets_total`  | `Counter` | Total number of read packets                          | Device |
-| `tuya_smartplug_sent_errors_total`   | `Counter` | Total number of sent errors                           | Device |
-| `tuya_smartplug_sent_packets_total`  | `Counter` | Total number of sent packets                          | Device |
+| Name                                       | Type      | Description                                             | Scope  |
+|--------------------------------------------|-----------|---------------------------------------------------------|--------|
+| `tuya_smartplug_last_scrape_error`         | `Counter` | Indication of overall error during scrape               | Global |
+| `tuya_smartplug_scrapes_total`             | `Summary` | Overall duration and count of scrapes                   | Global |
+| `tuya_smartplug_exporter_build_info`       | `Gauge`   | Build info                                              | Global |
+| `tuya_smartplug_current`                   | `Gauge`   | Electrical current drawn, in Amperes                    | Device |
+| `tuya_smartplug_power`                     | `Gauge`   | Total power used, in Watts                              | Device |
+| `tuya_smartplug_scrape_duration`           | `Summary` | Summary of scrape operation                             | Device |
+| `tuya_smartplug_switch_on`                 | `Gauge`   | Whether the plug is switched on (1 for on, 0 for off)   | Device |
+| `tuya_smartplug_voltage`                   | `Gauge`   | Electrical voltage, in Volts                            | Device |
+| `tuya_smartplug_read_errors_total`         | `Counter` | Total number of read errors                             | Device |
+| `tuya_smartplug_read_packets_total`        | `Counter` | Total number of read packets                            | Device |
+| `tuya_smartplug_sent_errors_total`         | `Counter` | Total number of sent errors                             | Device |
+| `tuya_smartplug_sent_packets_total`        | `Counter` | Total number of sent packets                            | Device |
+| `tuya_smartplug_last_success_read_seconds` | `Gauge`   | Unix timestamp in seconds when last read was successful | Device |
+| `tuya_smartplug_last_failed_read_seconds`  | `Gauge`   | Unix timestamp in seconds when last read has failed     | Device |
 
 
 ### Install using Helm chart to k8s cluster

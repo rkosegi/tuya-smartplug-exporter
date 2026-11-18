@@ -38,16 +38,20 @@ type Device struct {
 }
 
 type DeviceMetrics struct {
-	ScrapeDuration *prometheus.SummaryVec
-	ScrapeErrors   *prometheus.CounterVec
-	Current        *prometheus.GaugeVec
-	Voltage        *prometheus.GaugeVec
-	Power          *prometheus.GaugeVec
-	SwitchOn       *prometheus.GaugeVec
-	SentPackets    *prometheus.CounterVec
-	ReadPackets    *prometheus.CounterVec
-	SentErrors     *prometheus.CounterVec
-	ReadErrors     *prometheus.CounterVec
+	ScrapeDuration    *prometheus.SummaryVec
+	ScrapeErrors      *prometheus.CounterVec
+	Current           *prometheus.GaugeVec
+	Voltage           *prometheus.GaugeVec
+	Power             *prometheus.GaugeVec
+	SwitchOn          *prometheus.GaugeVec
+	SentPackets       *prometheus.CounterVec
+	ReadPackets       *prometheus.CounterVec
+	SentErrors        *prometheus.CounterVec
+	ReadErrors        *prometheus.CounterVec
+	LastSuccessRead   *prometheus.GaugeVec
+	LastFailedRead    *prometheus.GaugeVec
+	lastSuccessReadTs time.Time
+	lastFailedReadTs  time.Time
 }
 
 type GlobalMetrics struct {

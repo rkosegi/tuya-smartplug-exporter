@@ -19,6 +19,7 @@ package exporter
 import (
 	"log/slog"
 	"maps"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -113,41 +114,69 @@ func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 
 func (e *exporter) collectDevice(dname string, ch chan<- prometheus.Metric, wg *sync.WaitGroup) {
 	defer wg.Done()
+	l := e.l.With("device", dname)
 	m := e.newDeviceMetrics()
 	start := time.Now()
 	labels := prometheus.Labels{"device": dname}
-	status, stats, err := e.statusForDevice(dname)
-	devCfg := e.cfg.Devices[dname]
-	if devCfg.ExtraLabels != nil {
-		maps.Copy(labels, *devCfg.ExtraLabels)
-	}
-	if stats != nil {
-		m.ReadPackets.With(labels).Add(float64(stats.ReadPkts))
-		m.SentPackets.With(labels).Add(float64(stats.SentPkts))
-		if stats.ReadErrs > 0 {
-			m.ReadErrors.With(labels).Add(float64(stats.ReadErrs))
+
+	func() {
+		defer func() {
+			if err := recover(); err != nil {
+				l.Error("unhandled error during scrape", "error", err, "stack", string(debug.Stack()))
+				m.ScrapeErrors.With(labels).Inc()
+				e.m.Error.Set(1)
+				m.lastFailedReadTs = time.Now()
+				m.LastFailedRead.With(labels).Set(float64(m.lastSuccessReadTs.Unix()))
+			}
+		}()
+		status, stats, err := e.statusForDevice(dname)
+		devCfg := e.cfg.Devices[dname]
+		if devCfg.ExtraLabels != nil {
+			maps.Copy(labels, *devCfg.ExtraLabels)
 		}
-		if stats.SentErrs > 0 {
-			m.SentErrors.With(labels).Add(float64(stats.SentErrs))
+		if stats != nil {
+			m.ReadPackets.With(labels).Add(float64(stats.ReadPkts))
+			m.SentPackets.With(labels).Add(float64(stats.SentPkts))
+			if stats.ReadErrs > 0 {
+				m.ReadErrors.With(labels).Add(float64(stats.ReadErrs))
+			}
+			if stats.SentErrs > 0 {
+				m.SentErrors.With(labels).Add(float64(stats.SentErrs))
+			}
 		}
-	}
-	if err != nil {
-		e.l.Warn("error during scrape", "device", dname, "error", err)
-		m.ScrapeErrors.With(labels).Inc()
-		e.m.Error.Set(1)
-	} else {
-		e.l.Debug("Status of device", "device", dname, "status", status.Dps)
-		ison := 0
-		m.Current.With(labels).Set(float64(status.Dps.Current) / 1000)
-		m.Voltage.With(labels).Set(float64(status.Dps.Voltage) / 10)
-		m.Power.With(labels).Set(float64(status.Dps.Power) / 10)
-		if status.Dps.SwitchOn {
-			ison = 1
+		if err != nil {
+			l.Warn("error during scrape", "error", err)
+			m.ScrapeErrors.With(labels).Inc()
+			e.m.Error.Set(1)
+			m.lastFailedReadTs = time.Now()
+			m.LastFailedRead.With(labels).Set(float64(m.lastFailedReadTs.Unix()))
+		} else {
+			m.lastSuccessReadTs = time.Now()
+			m.LastSuccessRead.With(labels).Set(float64(m.lastSuccessReadTs.Unix()))
+
+			l.Debug("Status of device", "status", status.Dps)
+			ison := 0
+			m.Current.With(labels).Set(float64(status.Dps.Current) / 1000)
+			// sometimes it reports 0 volts, but that is impossible in reality
+			if status.Dps.Voltage != 0 {
+				m.Voltage.With(labels).Set(float64(status.Dps.Voltage) / 10)
+			}
+			m.Power.With(labels).Set(float64(status.Dps.Power) / 10)
+			if status.Dps.SwitchOn {
+				ison = 1
+			}
+			m.SwitchOn.With(labels).Set(float64(ison))
 		}
-		m.SwitchOn.With(labels).Set(float64(ison))
-	}
+	}()
+
 	m.ScrapeDuration.With(labels).Observe(time.Since(start).Seconds())
 
+	if !m.lastSuccessReadTs.IsZero() {
+		m.LastSuccessRead.Collect(ch)
+	}
+	if !m.lastFailedReadTs.IsZero() {
+		m.LastFailedRead.Collect(ch)
+	}
 	m.SwitchOn.Collect(ch)
 	m.Current.Collect(ch)
 	m.Voltage.Collect(ch)
@@ -157,7 +186,6 @@ func (e *exporter) collectDevice(dname string, ch chan<- prometheus.Metric, wg *
 	m.ReadErrors.Collect(ch)
 	m.SentErrors.Collect(ch)
 	m.ScrapeDuration.Collect(ch)
-
 }
 
 func New(cfg *internal.ConfigSpec, logger *slog.Logger) prometheus.Collector {
