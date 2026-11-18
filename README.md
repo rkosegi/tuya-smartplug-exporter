@@ -102,8 +102,8 @@ helm upgrade --install rkosegi/generic-exporter --values my-values.yaml
 ### Sample Grafana dashboard
 
 ![dashboard](docs/dashboard.jpg)
-
-
+![voltage heatmap](docs/volt_heatmap.png)
+![current heatmap](docs/curr_heatmap.png)
 ### Acknowledgment
 
 Portion of client code is inspired by @jasonacox implementation in [powermonitor](https://github.com/jasonacox/powermonitor)
