@@ -27,6 +27,6 @@ jobs:
     permissions:
       pull-requests: write
       issues: write
-    uses: rkosegi/github-workflows/.github/workflows/labeler.yaml@d661ba7e21a03d1bbd016928afe5737df58c8aeb # v0.0.2
+    uses: rkosegi/github-workflows/.github/workflows/labeler.yaml@9c2fa7903f12c13f9d0d391583de72f671bc8d9a # v0.0.13
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
