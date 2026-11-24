@@ -21,4 +21,4 @@ on:
 
 jobs:
   image:
-    uses: rkosegi/github-workflows/.github/workflows/publish-image.yaml@44a475d58970960b84eee2019935a368a6006840 # v0.0.11
+    uses: rkosegi/github-workflows/.github/workflows/publish-image.yaml@9c2fa7903f12c13f9d0d391583de72f671bc8d9a # v0.0.13
